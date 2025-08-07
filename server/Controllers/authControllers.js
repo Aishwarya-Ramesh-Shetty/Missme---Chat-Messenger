@@ -1,0 +1,45 @@
+const User = require("../models/User.js")
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
+exports.signupUser = async(req,res) =>{
+    const {name,email,mobile,password} = req.body
+    try{
+        const existingUser = await User.findOne({$or:[{email},{mobile}]})
+        if (existingUser){
+            return res.status(400).json({message:"Email or mobile already in use"})
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password,salt)
+
+        const newUser = new User({
+            name,
+            email,
+            mobile,
+            password:hashedPassword
+        })
+
+        await newUser.save()
+
+        const token = jwt.sign(
+            {id:newUser._id},
+            process.env.SECRET,
+            {expiresIn:'7d'}
+        )
+
+        res.status(201).json({message:"User created successfully",
+            user:{
+                id:newUser._id,
+                name:newUser.name,
+                email : newUser.email,
+                mobile:newUser.mobile
+            },
+            token
+        })
+    }
+    catch(error){
+        console.error(error)
+        res.status(500).json({message:"Server error "})
+    }
+}
