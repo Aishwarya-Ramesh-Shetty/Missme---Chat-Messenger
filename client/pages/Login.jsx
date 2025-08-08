@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate,Link } from "react-router-dom";
 import { useState } from "react";
-import Dashboard from "../components/Dashboard.jsx";
+import Chatbox from "../components/Chatbox.jsx";
 import Signup from "./Signup.jsx";
 
 const Login = () => {
@@ -24,10 +24,11 @@ const Login = () => {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem("token",data.token)
+        localStorage.setItem("user",JSON.stringify(data.user))
         alert("Login successfull");
         console.log(data);
       }
-      navigate("/dashboard");
+      navigate("/chatbox");
     } catch (error) {
       console.log(error);
       alert("Login failed in client");
