@@ -4,6 +4,8 @@ const cors = require("cors")
 const http = require('http')
 const socketIo = require('socket.io')
 const dotenv = require("dotenv")
+const Message = require("./models/Message.js")
+const chatRoutes = require('./routes/chatRoutes.js')
 
 dotenv.config()
 
@@ -24,6 +26,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 app.use('/api/auth/',authRoutes)
+app.use('/api/chat/',chatRoutes)
 
 
 const PORT = process.env.PORT || 5000;
@@ -40,9 +43,17 @@ mongoose.connect(process.env.MONGO_URI)
 
 io.on("connection",(socket)=>{
     console.log("New user connected:",socket.id)
-    socket.on("send message",({sender,receiver,message})=>{
+    socket.on("send message",async({sender,receiver,message})=>{
         console.log(`Message from ${sender} to ${receiver} : ${message}`)
-        io.emit("receive message",{sender,message,receiver})
+        try{
+            const newmessage = new Message({sender,receiver,message})
+            await newmessage.save()
+            io.emit("receive message",{sender,message,receiver})
+        }
+        catch(error){
+            console.error("Error saving message:", error);
+        }
+        
     })
 
     socket.on("disconnected",()=>{
@@ -53,6 +64,12 @@ io.on("connection",(socket)=>{
 app.get("/",(req,res)=>{
     console.log("Running ")
 })
+
+app.get("/messages", async (req, res) => {
+  const messages = await Message.find().sort({ createdAt: -1 });
+  res.json(messages);
+});
+
 
 server.listen(PORT,()=>{
     console.log(`Server listening on Port ${PORT}`)
