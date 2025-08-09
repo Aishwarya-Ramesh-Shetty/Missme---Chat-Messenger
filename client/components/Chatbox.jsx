@@ -5,6 +5,7 @@ const Chatbox = () => {
   const [message, setMessage] = useState("");
   const [chatlog, setChatlog] = useState([]);
   const [receiver, setReceiver] = useState("");
+  const [file, setFile] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const sender = user?.name || user?.email || "Anonymous";
@@ -46,11 +47,42 @@ const Chatbox = () => {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!receiver.trim()) {
+      alert("Please enter a receiver name before sending");
+      return;
+    }
+    if (!message.trim() && !file) return;
 
-    const messageData = { sender, receiver, message };
+    let fileUrl = "";
+
+    
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("http://localhost:5000/api/uploads", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        fileUrl = data.fileUrl; 
+      } catch (err) {
+        console.error("File upload failed:", err);
+        return;
+      }
+    }
+
+    const messageData = {
+      sender,
+      receiver,
+      message: message.trim(),
+      fileUrl, 
+    };
+
     socket.emit("send message", messageData);
     setMessage("");
+    setFile(null);
   };
 
   return (
@@ -82,7 +114,25 @@ const Chatbox = () => {
               margin: "5px 0",
             }}
           >
-            <strong>{msg.sender}:</strong> {msg.message}
+            <strong>{msg.sender}:</strong>{" "}
+            {msg.message && <span>{msg.message}</span>}
+            {msg.fileUrl && (
+              <div>
+                {msg.fileUrl.endsWith(".mp4") ? (
+                  <video src={msg.fileUrl} controls width="250" />
+                ) : msg.fileUrl.match(/\.(jpg|jpeg|png)$/) ? (
+                  <img
+                    src={msg.fileUrl}
+                    alt="sent"
+                    style={{ maxWidth: "200px" }}
+                  />
+                ) : (
+                  <a href={msg.fileUrl} target="_blank" rel="noreferrer">
+                    Download File
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -94,6 +144,11 @@ const Chatbox = () => {
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type your message"
           style={{ width: "70%" }}
+        />
+        <input
+          type="file"
+          onChange={(e) => setFile(e.target.files[0])}
+          style={{ marginTop: "10px" }}
         />
         <button type="submit" style={{ marginLeft: "10px" }}>
           Send

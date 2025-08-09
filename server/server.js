@@ -6,6 +6,7 @@ const socketIo = require('socket.io')
 const dotenv = require("dotenv")
 const Message = require("./models/Message.js")
 const chatRoutes = require('./routes/chatRoutes.js')
+const uploadRoute = require('./routes/uploadRoute.js')
 
 dotenv.config()
 
@@ -27,6 +28,8 @@ app.use(express.urlencoded({extended:true}))
 
 app.use('/api/auth/',authRoutes)
 app.use('/api/chat/',chatRoutes)
+app.use('/api',uploadRoute)
+app.use('/uploads',express.static('uploads'))
 
 
 const PORT = process.env.PORT || 5000;
@@ -41,25 +44,27 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 
-io.on("connection",(socket)=>{
-    console.log("New user connected:",socket.id)
-    socket.on("send message",async({sender,receiver,message})=>{
-        console.log(`Message from ${sender} to ${receiver} : ${message}`)
-        try{
-            const newmessage = new Message({sender,receiver,message})
-            await newmessage.save()
-            io.emit("receive message",{sender,message,receiver})
-        }
-        catch(error){
-            console.error("Error saving message:", error);
-        }
-        
-    })
+io.on("connection", (socket) => {
+  console.log("New user connected:", socket.id);
 
-    socket.on("disconnected",()=>{
-        console.log("User disconnected",socket.id)
-    })
-})
+  socket.on("send message", async ({ sender, receiver, message, fileUrl }) => {
+    if (!receiver) return; 
+
+    try {
+      const newMessage = new Message({ sender, receiver, message, fileUrl });
+      await newMessage.save();
+
+      io.emit("receive message", { sender, receiver, message, fileUrl });
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected", socket.id);
+  });
+});
+
 
 app.get("/",(req,res)=>{
     console.log("Running ")
