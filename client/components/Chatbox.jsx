@@ -3,11 +3,12 @@ import socket from "../socket";
 
 const Chatbox = () => {
   const [message, setMessage] = useState("");
-  const [chatlog, setChatlog] = useState([]);
+  const [chatlog, setChatlog] = useState([]); 
   const [receiver, setReceiver] = useState("");
   const [file, setFile] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token"); 
   const sender = user?.name || user?.email || "Anonymous";
 
   const fetchChatHistory = async () => {
@@ -15,12 +16,24 @@ const Chatbox = () => {
       if (!sender || !receiver) return;
 
       const res = await fetch(
-        `http://localhost:5000/api/chat/history?sender=${sender}&receiver=${receiver}`
+        `http://localhost:5000/api/chat/history?sender=${sender}&receiver=${receiver}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, 
+          },
+        }
       );
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch history: ${res.status}`);
+      }
+
       const data = await res.json();
-      setChatlog(data);
+      setChatlog(Array.isArray(data) ? data : []); 
     } catch (err) {
       console.error("Error fetching chat history", err);
+      setChatlog([]); 
     }
   };
 
@@ -41,7 +54,6 @@ const Chatbox = () => {
     };
 
     socket.on("receive message", handleReceive);
-
     return () => socket.off("receive message", handleReceive);
   }, [sender, receiver]);
 
@@ -55,7 +67,6 @@ const Chatbox = () => {
 
     let fileUrl = "";
 
-    
     if (file) {
       const formData = new FormData();
       formData.append("file", file);
@@ -63,10 +74,15 @@ const Chatbox = () => {
       try {
         const res = await fetch("http://localhost:5000/api/uploads", {
           method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
           body: formData,
         });
+
+        if (!res.ok) throw new Error("Upload failed");
         const data = await res.json();
-        fileUrl = data.fileUrl; 
+        fileUrl = data.fileUrl;
       } catch (err) {
         console.error("File upload failed:", err);
         return;
@@ -77,7 +93,7 @@ const Chatbox = () => {
       sender,
       receiver,
       message: message.trim(),
-      fileUrl, 
+      fileUrl,
     };
 
     socket.emit("send message", messageData);

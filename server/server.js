@@ -7,6 +7,7 @@ const dotenv = require("dotenv")
 const Message = require("./models/Message.js")
 const chatRoutes = require('./routes/chatRoutes.js')
 const uploadRoute = require('./routes/uploadRoute.js')
+const userRoutes = require("./routes/userRoutes");
 
 dotenv.config()
 
@@ -28,6 +29,7 @@ app.use(express.urlencoded({extended:true}))
 
 app.use('/api/auth/',authRoutes)
 app.use('/api/chat/',chatRoutes)
+app.use("/api/users", userRoutes);
 app.use('/api',uploadRoute)
 app.use('/uploads',express.static('uploads'))
 
