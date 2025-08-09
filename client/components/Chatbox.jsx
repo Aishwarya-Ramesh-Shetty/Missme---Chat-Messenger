@@ -83,7 +83,7 @@ const Chatbox = () => {
       formData.append("file", file);
 
       try {
-        const res = await fetch("http://localhost:5000/api/uploads", {
+        const res = await fetch(`${API_URL}/api/uploads`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
