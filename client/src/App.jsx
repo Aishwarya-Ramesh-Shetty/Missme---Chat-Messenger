@@ -5,10 +5,12 @@ import Signup from '../pages/Signup'
 import Dashboard from '../components/Dashboard'
 import Chatbox from '../components/Chatbox'
 import AdminDashboard from '../pages/AdminDashboard'
+import Navbar from '../pages/Navbar'
 
 const App = () => {
   return (
     <div>
+      <Navbar/>
       <Routes>
         <Route path='/' element={<Signup/>}/>
         <Route path='/login' element={<Login/>}/>

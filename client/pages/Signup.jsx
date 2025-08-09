@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Chatbox from '../components/Chatbox'
 
 const Signup = () => {
     const [name, setName] = useState("")
@@ -28,9 +27,17 @@ const Signup = () => {
             if (data.token) {
                 localStorage.setItem("token", data.token)
             }
+            // Store user info if sent by backend
+            if (data.user) {
+                localStorage.setItem("user", JSON.stringify(data.user))
+            }
+
+            // Trigger storage event so Navbar can detect login status change
+            window.dispatchEvent(new Event("storage"));
 
             alert("Signup successful")
             console.log("Server Response:", data)
+
             navigate("/chatbox")
         } catch (error) {
             console.error("Signup Error:", error.message)
