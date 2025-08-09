@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 
 const Login = () => {
   const [loginMethod, setLoginMethod] = useState("email");
@@ -12,7 +15,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Prepare payload as a flat object with keys 'emailOrMobile' and 'password'
+    
     const payload = {
       emailOrMobile: loginMethod === "email" ? email.trim() : mobile.trim(),
       password: password.trim(),
@@ -21,7 +24,7 @@ const Login = () => {
     console.log("Payload sent:", payload);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch("${API_URL}/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

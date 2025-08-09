@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 
 const Signup = () => {
     const [name, setName] = useState("")
@@ -11,7 +14,7 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const res = await fetch("http://localhost:5000/api/auth/signup", {
+            const res = await fetch("${API_URL}/api/auth/signup", {
                 method: 'POST',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name, email, mobile, password })
@@ -23,16 +26,16 @@ const Signup = () => {
                 throw new Error(data.message || "Signup failed")
             }
 
-            // Store token if exists
+           
             if (data.token) {
                 localStorage.setItem("token", data.token)
             }
-            // Store user info if sent by backend
+            
             if (data.user) {
                 localStorage.setItem("user", JSON.stringify(data.user))
             }
 
-            // Trigger storage event so Navbar can detect login status change
+            
             window.dispatchEvent(new Event("storage"));
 
             alert("Signup successful")
