@@ -24,6 +24,8 @@ const fileFilter = (req, file, cb) => {
     "image/png",
     "application/pdf",
     "video/mp4",
+    "video/webm",
+    "video/ogg",
   ];
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
