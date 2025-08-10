@@ -7,7 +7,7 @@ const dotenv = require("dotenv");
 const Message = require("./models/Message.js");
 const chatRoutes = require("./routes/chatRoutes.js");
 const uploadRoute = require("./routes/uploadRoute.js");
-const userRoutes = require("./routes/userRoutes");
+const userRoutes = require("./routes/userRoutes.js");
 const authRoutes = require("./routes/authRoutes.js");
 
 dotenv.config();
@@ -15,47 +15,33 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://missme-chat-messenger.vercel.app"
-];
-
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ["GET", "POST"],
-  credentials: true
-}));
-
 const io = socketIo(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: [
+      "http://localhost:5173", 
+      "https://missme-chat-messenger.onrender.com", 
+      "https://missme-chat-messenger.vercel.app/" 
+    ],
     methods: ["GET", "POST"],
-    credentials: true
-  }
+  },
 });
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/auth", authRoutes);
-app.use("/api/chat", chatRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/chat', chatRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api", uploadRoute);
-app.use("/uploads", express.static("uploads"));
-
-const PORT = process.env.PORT || 5000;
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("Mongodb connected");
-  })
-  .catch((err) => console.log(err));
+app.use('/api', uploadRoute);
+app.use('/uploads', express.static('uploads'));
 
 io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
 
   socket.on("send message", async ({ sender, receiver, message, fileUrl }) => {
     if (!receiver) return;
+
     try {
       const newMessage = new Message({ sender, receiver, message, fileUrl });
       await newMessage.save();
@@ -71,7 +57,7 @@ io.on("connection", (socket) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Backend is running ✅");
+  res.send("Server is running 🚀");
 });
 
 app.get("/messages", async (req, res) => {
@@ -79,6 +65,17 @@ app.get("/messages", async (req, res) => {
   res.json(messages);
 });
 
-server.listen(PORT, () => {
-  console.log(`Server listening on Port ${PORT}`);
-});
+const PORT = process.env.PORT || 5000;
+
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error("MongoDB connection failed:", err);
+    process.exit(1);
+  });
