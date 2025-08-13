@@ -8,6 +8,12 @@ Messages are stored in MongoDB so that conversations remain available even after
 
 ---
 
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/1ee093e5-c445-49be-b362-66abff2c1949" />
+<img width="1364" height="685" alt="image" src="https://github.com/user-attachments/assets/81116939-a94c-4315-a5ba-928c153a4def" />
+<img width="1363" height="685" alt="image" src="https://github.com/user-attachments/assets/53b04d86-cb25-486e-bb7e-046cce6d0f98" />
+
+
+
 ## 🎯 Why Missme?
 - **Real-time Feels** — Messages appear instantly. No more “seen after 2 hours” drama.
 - **Always Connected** — Works across devices like magic.
