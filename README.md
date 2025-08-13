@@ -1,8 +1,5 @@
 # 💌 Missme — Because Every Message Matters
 
-[![Watch the video](https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg)](https://youtu.be/v1FAaUxF0kg?si=Tb-2s2bW4reGyDKE)
-
-
 **Missme** is a MERN stack chat application with real-time messaging using **Socket.io**.  
 It allows users to sign up, log in, send and receive instant messages, and share files.  
 Messages are stored in MongoDB so that conversations remain available even after users go offline.
