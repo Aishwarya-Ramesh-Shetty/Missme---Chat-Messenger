@@ -1,5 +1,6 @@
 # 💌 Missme — Because Every Message Matters
 
+[![Watch the video]([https://user-images.githubusercontent.com/6877923/your-thumbnail.png](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pexels.com%2Fsearch%2Fdog%2F&psig=AOvVaw1wreG4VKCpMmA6vWrkHRTT&ust=1755180965668000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCLDS3uH8h48DFQAAAAAdAAAAABAE))]([https://user-images.githubusercontent.com/6877923/115474571-03c75800-a23e-11eb-8096-8973aad5fa9f.mp4](https://youtu.be/v1FAaUxF0kg?si=Tb-2s2bW4reGyDKE))
 
 
 **Missme** is a MERN stack chat application with real-time messaging using **Socket.io**.  
